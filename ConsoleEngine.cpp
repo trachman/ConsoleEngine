@@ -5,6 +5,15 @@
 #include <thread>
 
 
+// width
+// Static method for computing the offset into an array
+//
+int Utilities::computeTheOffset(const int row, const int col, const int width)
+{
+    return ( row * width ) + col;
+}
+
+
 // Constructor
 //
 ConsoleEngine::ConsoleEngine(const std::wstring& title, const int width, const int height)
@@ -268,15 +277,6 @@ bool ConsoleEngine::input(void)
 
 
 // width
-// Static method for computing the offset into an array
-//
-int ConsoleEngine::computeTheOffset(const int row, const int col, const int width)
-{
-    return ( row * width ) + col;
-}
-
-
-// width
 // Accessor for m_width
 //
 int ConsoleEngine::width(void) const
@@ -320,7 +320,7 @@ void ConsoleEngine::drawStringToBuffer(
 //
 int ConsoleEngine::computeOffset(const int row, const int col) const
 {
-    return ConsoleEngine::computeTheOffset(row, col, m_width);
+    return Utilities::computeTheOffset(row, col, m_width);
 }
 
 

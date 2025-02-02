@@ -5,6 +5,11 @@
 #include <vector>
 
 
+namespace Utilities
+{
+    [[nodiscard]] int computeTheOffset(const int row, const int col, const int width);
+}
+
 class ConsoleEngine
 {
 public:
@@ -36,15 +41,14 @@ public:
 
     [[nodiscard]] int gameLoop(void);
     [[nodiscard]] bool initializeConsole(void);
-    [[nodiscard]] virtual bool update(const double deltaTime) = 0;
-    [[nodiscard]] virtual bool render(void);
-    [[nodiscard]] bool input(void);
-    [[nodiscard]] static int computeTheOffset(const int row, const int col, const int width);
 
 protected:
+    [[nodiscard]] virtual bool update(const double deltaTime) = 0;
+    [[nodiscard]] virtual bool render(void);
     virtual void resetGameState(void) = 0;
     virtual void onGameBegin(void) = 0;
     virtual PlayAgain onGameEnd(void) const = 0;
+    [[nodiscard]] bool input(void);
     [[nodiscard]] int width(void) const;
     [[nodiscard]] int height(void) const;
     void drawStringToBuffer(const std::wstring& string, const int row, const int col);

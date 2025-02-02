@@ -91,5 +91,5 @@ void Block::moveLeft(void)
 
 int Block::offset(const int width) const
 {
-    return ConsoleEngine::computeTheOffset(m_row, m_col, width);
+    return Utilities::computeTheOffset(m_row, m_col, width);
 }
