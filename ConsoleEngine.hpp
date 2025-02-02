@@ -19,6 +19,12 @@ public:
         RIGHT     = 5
     };
 
+    enum class PlayAgain
+    {
+        YES = 0,
+        NO = 1
+    };
+
     ConsoleEngine(const std::wstring& title, const int width, const int height);
     virtual ~ConsoleEngine(void);
 
@@ -36,6 +42,9 @@ public:
     [[nodiscard]] static int computeTheOffset(const int row, const int col, const int width);
 
 protected:
+    virtual void resetGameState(void) = 0;
+    virtual void onGameBegin(void) = 0;
+    virtual PlayAgain onGameEnd(void) const = 0;
     [[nodiscard]] int width(void) const;
     [[nodiscard]] int height(void) const;
     void drawStringToBuffer(const std::wstring& string, const int row, const int col);

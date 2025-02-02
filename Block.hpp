@@ -20,7 +20,7 @@ public:
     [[nodiscard]] std::pair<int, int> location(void) const;
 
 private:
-    int offset(const int width) const;
+    [[nodiscard]] int offset(const int width) const;
 
     void moveDown(void);
     void moveRight(void);

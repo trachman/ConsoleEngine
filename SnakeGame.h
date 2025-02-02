@@ -9,7 +9,7 @@ class SnakeGame : public ConsoleEngine
 {
 public:
     SnakeGame(const std::wstring& title, const int width, const int height);
-    virtual ~SnakeGame(void);
+    virtual ~SnakeGame(void) = default;
 
     SnakeGame(void) = delete;
     SnakeGame(const SnakeGame& RHS) = delete;
@@ -21,6 +21,9 @@ public:
     [[nodiscard]] bool render(void) override;
 
 private:
+    void resetGameState(void) override;
+    void onGameBegin(void) override;
+    PlayAgain onGameEnd(void) const override;
     void handleInputEvents(void);
     void drawFPSToOutputBuffer(void);
     void drawScoreToOutputBuffer(void);

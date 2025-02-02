@@ -46,43 +46,55 @@ int ConsoleEngine::gameLoop(void)
 {
     using namespace std::chrono;
 
-    high_resolution_clock timer;
-    auto lastFrame = timer.now();
+    this->onGameBegin();
 
-    while (m_running)
+    while (true)
     {
-        // Clear any stale data
-        this->clearOutputBuffer();
+        this->resetGameState();
 
-        // Get user input
-        if (!this->input())
+        high_resolution_clock timer;
+        auto lastFrame = timer.now();
+
+        while (m_running)
         {
-            std::cout << "Error getting user input." << std::endl;
+            // Compute delta time
+            auto timeNow = timer.now();
+            auto deltaTimeMicro = duration_cast<microseconds>(timeNow - lastFrame).count();
+            double deltaTimeSeconds = static_cast<double>(deltaTimeMicro) * 1e-6;
+            lastFrame = timeNow;
+            m_fps = 1.0 / deltaTimeSeconds;
 
-            return EXIT_FAILURE;
+            // Clear any stale data
+            this->clearOutputBuffer();
+
+            // Get user input
+            if (!this->input())
+            {
+                std::cout << "Error getting user input." << std::endl;
+
+                return EXIT_FAILURE;
+            }
+
+            // Update game state
+            if (!this->update(deltaTimeSeconds))
+            {
+                std::cout << "Error updating game state." << std::endl;
+
+                return EXIT_FAILURE;
+            }
+
+            // Render game state
+            if (!this->render())
+            {
+                std::cout << "Error rendering." << std::endl;
+
+                return EXIT_FAILURE;
+            }
         }
 
-        // Compute delta time
-        auto timeNow = timer.now();
-        auto deltaTimeMicro = duration_cast<microseconds>(timeNow - lastFrame).count();
-        double deltaTimeSeconds = static_cast<double>(deltaTimeMicro) * 1e-6;
-        lastFrame = timeNow;
-        m_fps = 1.0 / deltaTimeSeconds;
-
-        // Update game state
-        if (!this->update(deltaTimeSeconds))
+        if (this->onGameEnd() != PlayAgain::YES)
         {
-            std::cout << "Error updating game state." << std::endl;
-
-            return EXIT_FAILURE;
-        }
-
-        // Render game state
-        if (!this->render())
-        {
-            std::cout << "Error rendering." << std::endl;
-
-            return EXIT_FAILURE;
+            break;
         }
     }
 
@@ -95,7 +107,7 @@ int ConsoleEngine::gameLoop(void)
 //
 bool ConsoleEngine::initializeConsole(void)
 {
-    // Get handle to STDIN
+    // Get input handle
     m_stdInput = GetStdHandle(STD_INPUT_HANDLE);
 
     if (m_stdInput == INVALID_HANDLE_VALUE)
@@ -105,7 +117,7 @@ bool ConsoleEngine::initializeConsole(void)
         return false;
     }
 
-    // Get handle to STDOUTPUT
+    // Get output handle
     m_stdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
     if (m_stdOutput == INVALID_HANDLE_VALUE)
@@ -115,7 +127,7 @@ bool ConsoleEngine::initializeConsole(void)
         return false;
     }
 
-    // Set the console title
+    // Set the window title
     if (!SetConsoleTitle(m_title.data()))
     {
         std::cout << "Unable to set console title." << std::endl;
@@ -123,7 +135,7 @@ bool ConsoleEngine::initializeConsole(void)
         return false;
     }
 
-    // Hide the blinking cursor
+    // Remove the cursor
     CONSOLE_CURSOR_INFO curInfo;
 
     if (!GetConsoleCursorInfo(m_stdOutput, &curInfo))
@@ -142,17 +154,39 @@ bool ConsoleEngine::initializeConsole(void)
         return false;
     }
 
-    // Initiailize the output buffer
+    // Keep the same initial dimensions
+    RECT windowRectangle;
+    WCHAR consoleTitle[50];
+    GetConsoleTitle(consoleTitle, 50);
+    HWND windowHandle = FindWindow(nullptr, consoleTitle);
+    GetWindowRect(windowHandle, &windowRectangle);
+
+    // Get the screen dimensions
+    const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+    const int centerWidth = screenWidth / 2;
+    const int centerHeight = screenHeight / 2;
+
+    // Calculate new top
+    const int width = windowRectangle.right - windowRectangle.left;
+    const int height = windowRectangle.bottom - windowRectangle.top;
+
+    // Center the window
+    SetWindowPos(
+        windowHandle,
+        nullptr,
+        centerWidth - (width / 2),
+        centerHeight - (height / 2),
+        width,
+        height,
+        NULL);
+
+    // Initialize buffers
     this->initializeOutputBuffer();
 
-    // Initialize the input buffer
     this->initializeInputBuffer();
 
-    // Flush the console
     this->flushConsole();
-
-    // We can start playing the game
-    m_running = true;
 
     return true;
 }
