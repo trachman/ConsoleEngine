@@ -59,10 +59,12 @@ void SnakeGame::onGameBegin(void)
     const std::wstring instructions = L"Use your Arrow Keys or W, A, S, D to move.";
     const std::wstring quitInstructions = L"Press 'q' or 'ESC' to quit.";
     const std::wstring playInstructions = L"Press any of the above keys to play.";
+    const std::wstring credits = L"Developed by Tristan Rachman :)";
     this->drawStringToBuffer(welcomeMessage, 11, 40);
     this->drawStringToBuffer(instructions, 12, 40);
     this->drawStringToBuffer(quitInstructions, 13, 40);
     this->drawStringToBuffer(playInstructions, 14, 40);
+    this->drawStringToBuffer(credits, 17, 40);
 
     while (true)
     {

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <chrono>
 #include <iostream>
+#include <thread>
 
 
 // Constructor
@@ -153,6 +154,9 @@ bool ConsoleEngine::initializeConsole(void)
 
         return false;
     }
+
+    // Sleep, otherwise we run to fast to center the window
+    std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
     // Keep the same initial dimensions
     RECT windowRectangle;
