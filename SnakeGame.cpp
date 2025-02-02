@@ -6,7 +6,7 @@
 SnakeGame::SnakeGame(const std::wstring& title, const int width, const int height)
 : m_score(0),
   m_snake(height / 2, width / 2),
-  m_currentDirection(Input::UP),
+  m_currentDirection(Input::NONE),
   m_candy(20, 20, FOREGROUND_GREEN),
   ConsoleEngine(title, width, height)
 {
